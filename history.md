@@ -1,5 +1,49 @@
 # Codex Project History
 
+## Cycle 2 — 2026-05-21: Custom Persona Subagents
+
+### Problem
+Persona skills such as product manager, product designer, architect, reviewer, data scientist, historian, and UI tester were available as slash-command skills, but they did not define independent subagent model, reasoning, or sandbox defaults.
+
+### Changes Applied
+- Added global custom subagents under `~/.codex/agents`
+- Mirrored the same subagents under `~/.codex-app/agents` for Codex Desktop compatibility
+- Created persona subagents: `product_manager`, `product_designer`, `technical_architect`, `code_reviewer`, `data_scientist`, `project_historian`, `ui_tester`
+- Created operational subagents: `explorer`, `docs_researcher`, `builder`
+- Left `security-best-practices` as a skill-only workflow because it has detailed reference-loading behavior and should trigger only for explicit security requests
+- Installed Lazyweb design skills from `aboul3ata/lazyweb-skill` into both `~/.codex/skills` and `~/.codex-app/skills`
+- Updated `product_manager` to explicitly review PRDs, roadmaps, product briefs, backlog/issues, and project history before giving scope verdicts
+- Updated `product_designer` to use Lazyweb and Playwright when relevant, produce high-fidelity mockup artifacts, save them under `.design/product-designer/{topic}-{date}/`, and create `builder-handoff.md` for the next builder/coder
+- Updated `ui_tester` to explicitly use the `$playwright` skill and wrapper-script workflow for browser automation, snapshots, and artifacts under `output/playwright/`
+- Restored structured handoff tags for `product_manager`, `technical_architect`, and `code_reviewer`
+- Narrowed `product_designer` writes to `.design/product-designer/{topic}-{date}/` unless implementation work is explicitly assigned
+- Set `ui_tester` to `workspace-write` and limited ordinary writes to `output/playwright/`
+- Kept `data_scientist` advisory-only with read-only sandbox
+- Changed `builder` to `gpt-5.4` with `medium` reasoning
+- Removed the `code-reviewer` skill package from `~/.codex-app/skills` so reviewer routing uses the `code_reviewer` subagent only
+- Removed duplicate persona skill packages from `~/.codex-app/skills`: `data-scientist`, `product-designer`, `product-manager`, `project-historian`, `technical-architect`, and `ui-tester`
+- Removed the same duplicate persona skill packages from Windows `C:\Users\patpp\.codex\skills`
+- Mirrored the custom subagent TOML files into Windows `C:\Users\patpp\.codex\agents` so Windows and WSL Codex configs have matching subagents
+
+### Model Defaults
+| Agent | Model | Reasoning | Sandbox |
+|-------|-------|-----------|---------|
+| `explorer` | `gpt-5.4-mini` | `medium` | `read-only` |
+| `docs_researcher` | `gpt-5.4-mini` | `medium` | `read-only` |
+| `builder` | `gpt-5.4` | `medium` | inherited |
+| `product_manager` | `gpt-5.5` | `xhigh` | `read-only` |
+| `product_designer` | `gpt-5.5` | `high` | `workspace-write` |
+| `technical_architect` | `gpt-5.5` | `xhigh` | `read-only` |
+| `code_reviewer` | `gpt-5.4` | `high` | `read-only` |
+| `data_scientist` | `gpt-5.4` | `high` | `read-only` |
+| `project_historian` | `gpt-5.4-mini` | `medium` | `workspace-write` |
+| `ui_tester` | `gpt-5.4` | `high` | `workspace-write` |
+
+### Verification
+- Parsed all TOML files in both agent directories with Python `tomllib`
+- Confirmed `security_best_practices.toml` is absent from both agent directories
+- Confirmed duplicate persona skill folders are absent across WSL `~/.codex`, WSL `~/.codex-app`, Windows `C:\Users\patpp\.codex`, and checked project-local Codex roots
+
 ## Cycle 1 — 2026-05-15: Codex Desktop WSL+Ollama Configuration Fix
 
 ### Problem
